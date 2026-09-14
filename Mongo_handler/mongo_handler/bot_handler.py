@@ -87,12 +87,10 @@ def get_status_error_keyboard(identifier: str, failed_type: str):
     Returns the InlineKeyboardMarkup for status lookup failure, 
     offering to search again (for different types) or create a ticket.
     """
-    # Use a shorter version of the identifier for display if it's too long
     display_id = identifier if len(identifier) < 30 else f"{identifier[:15]}..." 
     
     keyboard = []
     
-    # Define all available types and exclude the one that just failed
     all_types = {"order_id": "Order ID", "utr": "UTR", "ref_id": "Ref ID"}
     
     # Add buttons for the two other search types
@@ -191,7 +189,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             await start(update, context)
         return
 
-    # --- All possible states ---
+    # All possible states
     awaiting_order = context.user_data.get('awaiting_order', False)
     # Replaced awaiting_status_lookup with awaiting_identifier and awaiting_search_type
     awaiting_identifier = context.user_data.get('awaiting_identifier', False) 
@@ -200,7 +198,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
 
     logger.info("Private message from %s: %r", user.id, text)
 
-    # --- Step 1: TICKET CREATION ---
+    # Step 1: TICKET CREATION 
     if awaiting_order:
         order_id = text.strip()
         if not order_id or len(order_id) > 80:
@@ -310,7 +308,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
         await update.message.reply_text("What would you like to do next?", reply_markup=get_main_menu_keyboard())
 
 
-    # --- 3: TICKET FOLLOW-UP ---
+    # 3: TICKET FOLLOW-UP 
     elif awaiting_remarks:
         remarks_text = text.strip()
         ticket_id = context.user_data.get('ticket_id')
