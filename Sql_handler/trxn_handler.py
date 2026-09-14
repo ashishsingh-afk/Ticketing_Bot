@@ -2,12 +2,12 @@ import logging
 from typing import Optional, Dict, Any
 from mysql.connector import pooling, Error as MySQLError
 
-# --- Using the structure/pattern from db_handler.py ---
+# Using the structure/pattern from db_handler.py
 DB_CONFIG = {
-    "host": "127.0.0.1",
+    "host": "******",
     "database": "trxn_handler", # Using the database name from your image: trxn_handler
     "user": "root",
-    "password": "0805",
+    "password": "****",
 }
 POOL_NAME = "trxnpool"
 POOL_SIZE = 5
@@ -50,7 +50,7 @@ def get_transaction_status_by_identifier(identifier: str) -> Optional[Dict[str, 
         conn = get_conn()
         cur = conn.cursor(dictionary=True) 
         
-        # NOTE: Assuming 'utr' is the column name in trxn_table
+        # Assuming 'utr' is the column name in trxn_table
         select_sql = """
             SELECT 
                 `order_id`, 
