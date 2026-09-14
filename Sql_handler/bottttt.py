@@ -24,8 +24,8 @@ from trxn_handler import get_transaction_status_by_identifier
 
 
 # Bot and group config - update token & target chat id
-BOT_TOKEN = "7980545762:AAFbzh1CRrNrQaI8enqrxpQiHNiwKLE_V7A"
-TARGET_CHAT_ID = -1003227550424
+BOT_TOKEN = "bot token"
+TARGET_CHAT_ID = "bot id"
 ATTACHMENTS_DIR = "attachments" # Local folder to store attachments
 
 logging.basicConfig(
@@ -38,8 +38,7 @@ logger = logging.getLogger(__name__)
 db_handler.init_pool()
 trxn_handler.init_pool() 
 
-# --- Utility Functions (Unchanged) ---
-
+# Utility Functions
 def get_follow_up_keyboard():
     """Returns the InlineKeyboardMarkup for follow-up actions."""
     keyboard = [
@@ -86,9 +85,7 @@ async def send_follow_up_options(update: Update, context: ContextTypes.DEFAULT_T
     )
 
 
-# ----------------------------------------------------------------------
 # Core Handlers
-# ----------------------------------------------------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
@@ -160,7 +157,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             await update.message.reply_text("Please reply with a valid **Order ID**.")
             return
         
-        # --- REVERTED ---
+        # REVERTED
         # We have the Order ID, now ask for issue type.
         context.user_data.clear() # Clear states
         context.user_data['order_id'] = order_id
@@ -177,8 +174,6 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             reply_markup=reply_markup
         )
         context.user_data['issue_message_id'] = sent.message_id
-    
-    # --- WORKFLOW 2: STATUS LOOKUP (This is the logic you want) ---
     elif awaiting_status_lookup:
         context.user_data['awaiting_status_lookup'] = False # Consume state
         identifier = text.strip()
@@ -196,7 +191,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
                 functools.partial(db_handler.check_if_ticket_exists, identifier)
             )
 
-            # --- THIS IS THE "GATE" ---
+            # THIS IS THE "GATE"
             if ticket_exists:
                 # Step 2: If ticket exists, THEN check trxn_handler
                 await update.message.reply_text("Ticket found. Now checking transaction status...")
@@ -230,7 +225,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
                     )
             
             else:
-                # Step 3: No ticket exists. DO NOT check trxn_table.-
+                # Step 3: No ticket exists. DO NOT check trxn_table.
                 status_message = (
                     f"❌ **Action Required**\n\n"
                     f"To check the status, a support ticket must exist for that identifier first.\n"
@@ -246,7 +241,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
         await update.message.reply_text("What would you like to do next?", reply_markup=get_main_menu_keyboard())
 
 
-    # --- WORKFLOW 3: TICKET FOLLOW-UP (Unchanged) ---
+    # WORKFLOW 3: TICKET FOLLOW-UP 
     elif awaiting_remarks:
         remarks_text = text.strip()
         ticket_id = context.user_data.get('ticket_id')
@@ -320,10 +315,7 @@ async def handle_private_message(update: Update, context: ContextTypes.DEFAULT_T
             reply_markup=get_main_menu_keyboard()
         )
 
-
-# ----------------------------------------------------------------------
 # Attachment Handler (Unchanged)
-# ----------------------------------------------------------------------
 
 async def handle_incoming_attachment(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.effective_message
@@ -406,11 +398,7 @@ async def handle_incoming_attachment(update: Update, context: ContextTypes.DEFAU
         logger.exception("Error saving attachment to DB for filename=%s", filename)
         await msg.reply_text("Sorry, I couldn't save the file to the database. The admin has been notified.")
 
-
-# ----------------------------------------------------------------------
 # Callback Query Handlers
-# ----------------------------------------------------------------------
-
 async def debug_callback_query(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     if not query:
@@ -461,7 +449,7 @@ async def handle_issue_selection(update: Update, context: ContextTypes.DEFAULT_T
     context.user_data['issue_type'] = issue_type
     logger.info("User %s selected issue %s", user.id, issue_type)
 
-    # --- REVERTED: Get only Order ID from context ---
+    # Get only Order ID from context 
     order_id = context.user_data.get('order_id')
     username = user.username or user.first_name
 
@@ -473,7 +461,7 @@ async def handle_issue_selection(update: Update, context: ContextTypes.DEFAULT_T
     loop = asyncio.get_running_loop()
     text_to_send = ""
     try:
-        # --- REVERTED function call ---
+        # REVERTED function call ---
         new_ticket_id = await loop.run_in_executor(
             None,
             functools.partial(db_handler.create_ticket, str(user.id), username, order_id, issue_type)
@@ -507,7 +495,7 @@ async def handle_issue_selection(update: Update, context: ContextTypes.DEFAULT_T
         
     try:
         issue_msg_id = context.user_data.get('issue_message_id')
-        # --- REVERTED confirmation text ---
+        # REVERTED confirmation text
         original_text = (
             f"Thanks — I received your Order ID: `{order_id}`.\n\n"
             f"Selected issue: {issue_type}\n\n"
