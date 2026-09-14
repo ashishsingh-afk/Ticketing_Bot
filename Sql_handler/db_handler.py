@@ -5,32 +5,23 @@ from typing import Optional, Tuple, Dict, Any
 from datetime import datetime
 import mysql.connector
 from mysql.connector import pooling, Error as MySQLError
-
-# Import Telegram types
 from telegram import Update
 from telegram.ext import ContextTypes
 
 logger = logging.getLogger(__name__)
 
-# --------------------------------------------
-# ----- DB CONFIG -----
-# --------------------------------------------
 DB_CONFIG = {
-    "host": "127.0.0.1",
+    "host": "********",
     "database": "bot",
     "user": "root",
-    "password": "0805",
+    "password": "****",
 }
 POOL_NAME = "mypool"
 POOL_SIZE = 5
-# --------------------------------------------
 
 _pool: Optional[pooling.MySQLConnectionPool] = None
 
-##
 # Database Connection and Pool Management
-##
-
 def init_pool():
     """Initializes the global MySQL connection pool."""
     global _pool
@@ -51,12 +42,8 @@ def get_conn() -> pooling.PooledMySQLConnection:
     if _pool is None:
         init_pool()
     return _pool.get_connection()
-
-##
 # Ticket Operations
-##
-
-# --- REVERTED to simple create_ticket ---
+# REVERTED to simple create_ticket 
 def create_ticket(user_id: str, username: str, order_id: str, issue_type: str) -> Optional[int]:
     """
     Inserts a ticket record (with order_id only) 
@@ -205,7 +192,7 @@ def append_ticket_remarks(ticket_id: int, additional_remarks: str) -> bool:
             except Exception: logger.exception("Failed to close connection (return to pool)")
 
 
-# --- KEPT ADVANCED check_if_ticket_exists ---
+# KEPT ADVANCED check_if_ticket_exists
 def check_if_ticket_exists(identifier: str) -> bool:
     """
     Checks if at least one ticket exists for a given Order ID, Ref ID, or UTR.
@@ -246,12 +233,7 @@ def check_if_ticket_exists(identifier: str) -> bool:
             try: conn.close()
             except Exception: logger.exception("Failed to close connection (return to pool)")
 
-
-##
 # Attachment Operations
-##
-# (No changes to save_attachment or retrieve_attachment)
-
 def save_attachment(ticket_id: int, filename: str, mime_type: str, file_bytes: bytes) -> int:
     conn = None
     cur = None
