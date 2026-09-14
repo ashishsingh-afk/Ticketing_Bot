@@ -13,7 +13,7 @@ from bson.errors import InvalidId
 
 logger = logging.getLogger(__name__)
 
-# ---MongoDB Client and Collections ---
+# MongoDB Client and Collections
 client: Optional[MongoClient] = None
 db: Optional[pymongo.database.Database] = None
 tickets_collection: Optional[pymongo.collection.Collection] = None
